@@ -83,7 +83,7 @@ namespace CadastroCandidato.Models
             }
         }
 
-        public Candidato GetCandidato(int CandidatoID)
+        public Candidato GetCandidato(int? CandidatoID)
         {
             Candidato candidato = new Candidato();
 
@@ -99,15 +99,37 @@ namespace CadastroCandidato.Models
                 con.Open();
 
                 SqlDataReader reader = cmdSel.ExecuteReader();
-                candidato.CandidatoID = Convert.ToInt32(reader["CandidatoID"]);
-                candidato.vchNome = reader["vchNome"].ToString();
-                candidato.vchEmail = reader["vchEmail"].ToString();
-                candidato.vchCidade = reader["vchCidade"].ToString();
-                candidato.vchEstado = reader["vchEstado"].ToString();
+
+                while (reader.Read())
+                {
+                    candidato.CandidatoID = Convert.ToInt32(reader["CandidatoID"]);
+                    candidato.vchNome = reader["vchNome"].ToString();
+                    candidato.vchEmail = reader["vchEmail"].ToString();
+                    candidato.vchCidade = reader["vchCidade"].ToString();
+                    candidato.vchEstado = reader["vchEstado"].ToString();
+
+                }
 
                 con.Close();
             }
             return candidato;
+        }
+
+        public void DeleteCandidato(int? CandidatoID)
+        {
+            using (SqlConnection con = new SqlConnection())
+            {
+                string queryDelete = "DELETE FROM Candidato WHERE CandidatoID = @CandidatoID";
+
+                SqlCommand cmdDel = new SqlCommand(queryDelete, con);
+                cmdDel.CommandType = CommandType.Text;
+
+                cmdDel.Parameters.AddWithValue("@CandidatoID", CandidatoID);
+
+                con.Open();
+                cmdDel.ExecuteNonQuery();
+                con.Close();
+            }
         }
     }
 }
